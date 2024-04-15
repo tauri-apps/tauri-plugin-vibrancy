@@ -28,4 +28,4 @@ jobs:
       - name: test tauri example
         run: |
           cd examples/tauri/src-tauri
-          cargo run --features tauri/custom-protocol
+          cargo test --features tauri/custom-protocol
