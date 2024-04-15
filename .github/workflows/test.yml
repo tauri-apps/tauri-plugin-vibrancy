@@ -25,3 +25,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test
+      - name: test tauri example
+        run: |
+          cd examples/tauri
+          cargo run --features tauri/custom-protocol
