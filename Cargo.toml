@@ -24,7 +24,7 @@ tao = "0.27"
 winit = "0.29"
 
 [target."cfg(target_os = \"windows\")".dependencies]
-windows-version = "0.1"
+windows-version = "0.1.1"
 
   [target."cfg(target_os = \"windows\")".dependencies.windows-sys]
   version = "0.52.0"
