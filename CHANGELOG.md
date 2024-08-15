@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.5.1]
+
+- [`9f3d05b`](https://github.com/tauri-apps/window-vibrancy/commit/9f3d05bc3ce6e413e0a08e286490fc937debfe8d) Update `windows-sys` crate to `0.59`
+
 ## \[0.5.0]
 
 - [`19cdde3`](https://github.com/tauri-apps/window-vibrancy/commit/19cdde3274a7be7e3f3caf117bc741f5284b6fc4)([#121](https://github.com/tauri-apps/window-vibrancy/pull/121)) **Breaking change** Update `raw-window-handle` crate to 0.6. Now APIs require `HasWindowHandle` trait boundary instead of `HasRawWindowHandle`.
