@@ -8,11 +8,7 @@
 #![allow(clippy::upper_case_acronyms)]
 
 use std::ffi::c_void;
-pub use windows_sys::Win32::{
-    Foundation::*,
-    Graphics::{Dwm::*, Gdi::*},
-    System::LibraryLoader::*,
-};
+pub use windows_sys::Win32::{Foundation::*, Graphics::Dwm::*, System::LibraryLoader::*};
 
 use crate::{Color, Error};
 
@@ -21,7 +17,7 @@ pub fn apply_blur(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
         let bb = DWM_BLURBEHIND {
             dwFlags: DWM_BB_ENABLE,
             fEnable: true.into(),
-            hRgnBlur: HRGN::default(),
+            hRgnBlur: std::ptr::null_mut(),
             fTransitionOnMaximized: 0,
         };
         unsafe {
@@ -44,7 +40,7 @@ pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
         let bb = DWM_BLURBEHIND {
             dwFlags: DWM_BB_ENABLE,
             fEnable: false.into(),
-            hRgnBlur: HRGN::default(),
+            hRgnBlur: std::ptr::null_mut(),
             fTransitionOnMaximized: 0,
         };
         unsafe {
@@ -217,7 +213,7 @@ fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
     assert_eq!(function.chars().last(), Some('\0'));
 
     let module = unsafe { LoadLibraryA(library.as_ptr()) };
-    if module == 0 {
+    if module.is_null() {
         return None;
     }
     Some(unsafe { GetProcAddress(module, function.as_ptr()) })
