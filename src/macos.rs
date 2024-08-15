@@ -150,7 +150,7 @@ mod internal {
 
     // macos 10.10+
     // https://developer.apple.com/documentation/appkit/nsvisualeffectview
-    #[allow(non_snake_case)]
+    #[allow(non_snake_case, dead_code)]
     trait NSVisualEffectView: Sized {
         unsafe fn alloc(_: Self) -> id {
             msg_send![class!(NSVisualEffectView), alloc]
