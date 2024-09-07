@@ -220,9 +220,9 @@ pub fn apply_vibrancy(
 ) -> Result<(), Error> {
     match window.window_handle()?.as_raw() {
         #[cfg(target_os = "macos")]
-        raw_window_handle::RawWindowHandle::AppKit(handle) => {
-            macos::apply_vibrancy(handle.ns_view.as_ptr() as _, effect, state, radius)
-        }
+        raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
+            macos::apply_vibrancy(handle.ns_view, effect, state, radius)
+        },
         _ => Err(Error::UnsupportedPlatform(
             "\"apply_vibrancy()\" is only supported on macOS.",
         )),

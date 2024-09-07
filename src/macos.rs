@@ -74,29 +74,31 @@ pub use internal::apply_vibrancy;
 
 #[cfg(target_os = "macos")]
 mod internal {
-    use super::{NSVisualEffectMaterial, NSVisualEffectState};
+    use std::{ffi::c_void, ptr::NonNull};
 
-    use cocoa::{
-        appkit::{
-            NSAppKitVersionNumber, NSAppKitVersionNumber10_10, NSAppKitVersionNumber10_11,
-            NSAutoresizingMaskOptions, NSView, NSViewHeightSizable, NSViewWidthSizable,
-            NSWindowOrderingMode,
-        },
-        base::{id, nil, BOOL},
-        foundation::{NSAutoreleasePool, NSPoint, NSRect, NSSize},
+    use objc2_app_kit::{
+        NSAppKitVersionNumber, NSAppKitVersionNumber10_10, NSAppKitVersionNumber10_11,
+        NSAppKitVersionNumber10_14, NSAutoresizingMaskOptions, NSView, NSVisualEffectBlendingMode,
+        NSVisualEffectMaterial, NSVisualEffectState, NSVisualEffectView, NSWindowOrderingMode,
     };
-    use objc::{class, msg_send, sel, sel_impl};
+    use objc2_foundation::{CGFloat, MainThreadMarker};
 
     use crate::Error;
 
     #[allow(deprecated)]
-    pub fn apply_vibrancy(
-        ns_view: id,
-        appearance: NSVisualEffectMaterial,
-        state: Option<NSVisualEffectState>,
+    pub unsafe fn apply_vibrancy(
+        ns_view: NonNull<c_void>,
+        appearance: super::NSVisualEffectMaterial,
+        state: Option<super::NSVisualEffectState>,
         radius: Option<f64>,
     ) -> Result<(), Error> {
+        let mtm = MainThreadMarker::new().ok_or_else(|| {
+            Error::NotMainThread("\"apply_vibrancy()\" can only be used on the main thread.")
+        })?;
+
         unsafe {
+            let view: &NSView = ns_view.cast().as_ref();
+
             if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
                 eprintln!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
                 return Err(Error::UnsupportedPlatformVersion(
@@ -104,142 +106,40 @@ mod internal {
                 ));
             }
 
-            if !msg_send![class!(NSThread), isMainThread] {
-                return Err(Error::NotMainThread(
-                    "\"apply_vibrancy()\" can only be used on the main thread.",
-                ));
-            }
-
-            let mut m = appearance;
+            let mut m = NSVisualEffectMaterial(appearance as isize);
             if (appearance as u32 > 9 && NSAppKitVersionNumber < NSAppKitVersionNumber10_14)
                 || (appearance as u32 > 4 && NSAppKitVersionNumber < NSAppKitVersionNumber10_11)
             {
                 m = NSVisualEffectMaterial::AppearanceBased;
             }
 
-            let bounds = NSView::bounds(ns_view);
-            let blurred_view =
-                NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
-            blurred_view.autorelease();
+            let bounds = view.bounds();
+            let blurred_view = NSVisualEffectView::initWithFrame(mtm.alloc(), bounds);
 
-            blurred_view.setMaterial_(m);
-            blurred_view.setCornerRadius_(radius.unwrap_or(0.0));
-            blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
-            blurred_view.setState_(state.unwrap_or(NSVisualEffectState::FollowsWindowActiveState));
-            NSVisualEffectView::setAutoresizingMask_(
-                blurred_view,
-                NSViewWidthSizable | NSViewHeightSizable,
+            blurred_view.setMaterial(m);
+            set_corner_radius(&blurred_view, radius.unwrap_or(0.0));
+            blurred_view.setBlendingMode(NSVisualEffectBlendingMode::BehindWindow);
+            blurred_view.setState(
+                state
+                    .map(|state| NSVisualEffectState(state as isize))
+                    .unwrap_or(NSVisualEffectState::FollowsWindowActiveState),
+            );
+            blurred_view.setAutoresizingMask(
+                NSAutoresizingMaskOptions::NSViewWidthSizable
+                    | NSAutoresizingMaskOptions::NSViewHeightSizable,
             );
 
-            let _: () = msg_send![ns_view, addSubview: blurred_view positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
+            view.addSubview_positioned_relativeTo(
+                &blurred_view,
+                NSWindowOrderingMode::NSWindowBelow,
+                None,
+            );
         }
         Ok(())
     }
 
-    #[allow(non_upper_case_globals)]
-    const NSAppKitVersionNumber10_14: f64 = 1671.0;
-
-    // https://developer.apple.com/documentation/appkit/nsvisualeffectview/blendingmode
-    #[allow(dead_code)]
-    #[repr(u64)]
-    #[derive(Clone, Copy, Debug, PartialEq)]
-    enum NSVisualEffectBlendingMode {
-        BehindWindow = 0,
-        WithinWindow = 1,
-    }
-
-    // macos 10.10+
-    // https://developer.apple.com/documentation/appkit/nsvisualeffectview
-    #[allow(non_snake_case, dead_code)]
-    trait NSVisualEffectView: Sized {
-        unsafe fn alloc(_: Self) -> id {
-            msg_send![class!(NSVisualEffectView), alloc]
-        }
-
-        unsafe fn init(self) -> id;
-        unsafe fn initWithFrame_(self, frameRect: NSRect) -> id;
-        unsafe fn bounds(self) -> NSRect;
-        unsafe fn frame(self) -> NSRect;
-        unsafe fn setFrameSize(self, frameSize: NSSize);
-        unsafe fn setFrameOrigin(self, frameOrigin: NSPoint);
-
-        unsafe fn superview(self) -> id;
-        unsafe fn removeFromSuperview(self);
-        unsafe fn setAutoresizingMask_(self, autoresizingMask: NSAutoresizingMaskOptions);
-
-        // API_AVAILABLE(macos(10.12));
-        unsafe fn isEmphasized(self) -> BOOL;
-        // API_AVAILABLE(macos(10.12));
-        unsafe fn setEmphasized_(self, emphasized: BOOL);
-
-        unsafe fn setMaterial_(self, material: NSVisualEffectMaterial);
-        unsafe fn setCornerRadius_(self, radius: f64);
-        unsafe fn setState_(self, state: NSVisualEffectState);
-        unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode);
-    }
-
-    #[allow(non_snake_case)]
-    impl NSVisualEffectView for id {
-        unsafe fn init(self) -> id {
-            msg_send![self, init]
-        }
-
-        unsafe fn initWithFrame_(self, frameRect: NSRect) -> id {
-            msg_send![self, initWithFrame: frameRect]
-        }
-
-        unsafe fn bounds(self) -> NSRect {
-            msg_send![self, bounds]
-        }
-
-        unsafe fn frame(self) -> NSRect {
-            msg_send![self, frame]
-        }
-
-        unsafe fn setFrameSize(self, frameSize: NSSize) {
-            msg_send![self, setFrameSize: frameSize]
-        }
-
-        unsafe fn setFrameOrigin(self, frameOrigin: NSPoint) {
-            msg_send![self, setFrameOrigin: frameOrigin]
-        }
-
-        unsafe fn superview(self) -> id {
-            msg_send![self, superview]
-        }
-
-        unsafe fn removeFromSuperview(self) {
-            msg_send![self, removeFromSuperview]
-        }
-
-        unsafe fn setAutoresizingMask_(self, autoresizingMask: NSAutoresizingMaskOptions) {
-            msg_send![self, setAutoresizingMask: autoresizingMask]
-        }
-
-        // API_AVAILABLE(macos(10.12));
-        unsafe fn isEmphasized(self) -> BOOL {
-            msg_send![self, isEmphasized]
-        }
-
-        // API_AVAILABLE(macos(10.12));
-        unsafe fn setEmphasized_(self, emphasized: BOOL) {
-            msg_send![self, setEmphasized: emphasized]
-        }
-
-        unsafe fn setMaterial_(self, material: NSVisualEffectMaterial) {
-            msg_send![self, setMaterial: material]
-        }
-
-        unsafe fn setCornerRadius_(self, radius: f64) {
-            msg_send![self, setCornerRadius: radius]
-        }
-
-        unsafe fn setState_(self, state: NSVisualEffectState) {
-            msg_send![self, setState: state]
-        }
-
-        unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode) {
-            msg_send![self, setBlendingMode: mode]
-        }
+    // TODO: Does not seem to be public?
+    fn set_corner_radius(view: &NSVisualEffectView, radius: CGFloat) {
+        unsafe { objc2::msg_send![view, setCornerRadius: radius] }
     }
 }
