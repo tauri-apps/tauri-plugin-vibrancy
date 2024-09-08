@@ -92,15 +92,14 @@ mod internal {
         state: Option<super::NSVisualEffectState>,
         radius: Option<f64>,
     ) -> Result<(), Error> {
-        let mtm = MainThreadMarker::new().ok_or_else(|| {
-            Error::NotMainThread("\"apply_vibrancy()\" can only be used on the main thread.")
-        })?;
+        let mtm = MainThreadMarker::new().ok_or(Error::NotMainThread(
+            "\"apply_vibrancy()\" can only be used on the main thread.",
+        ))?;
 
         unsafe {
             let view: &NSView = ns_view.cast().as_ref();
 
             if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
-                eprintln!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
                 return Err(Error::UnsupportedPlatformVersion(
                     "\"apply_vibrancy()\" is only available on macOS 10.0 or newer.",
                 ));
