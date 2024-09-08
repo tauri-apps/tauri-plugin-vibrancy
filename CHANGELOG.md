@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.5.2]
+
+- [`3325c24`](https://github.com/tauri-apps/window-vibrancy/commit/3325c24bccbca19f6b93b11adfa0e3b2ab595f73) ([#150](https://github.com/tauri-apps/window-vibrancy/pull/150) by [@madsmtm](https://github.com/tauri-apps/window-vibrancy/../../madsmtm)) Use `objc2` internally, leading to better memory safety.
+
 ## \[0.5.1]
 
 - [`9f3d05b`](https://github.com/tauri-apps/window-vibrancy/commit/9f3d05bc3ce6e413e0a08e286490fc937debfe8d) Update `windows-sys` crate to `0.59`
