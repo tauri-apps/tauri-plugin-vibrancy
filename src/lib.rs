@@ -26,7 +26,7 @@
 mod macos;
 mod windows;
 
-pub use macos::{NSVisualEffectMaterial, NSVisualEffectState};
+pub use macos::{NSVisualEffectMaterial, NSVisualEffectState, NSVisualEffectViewTagged};
 
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
@@ -225,6 +225,28 @@ pub fn apply_vibrancy(
         },
         _ => Err(Error::UnsupportedPlatform(
             "\"apply_vibrancy()\" is only supported on macOS.",
+        )),
+    }
+}
+
+/// Clears vibrancy effect applied to window. Works only on macOS 10.10 or newer.
+///
+/// ## Platform-specific
+///
+/// - **Linux / Windows**: Unsupported.
+///
+/// # Returns
+///
+/// - `Ok(true)` if the vibrancy effect was cleared
+/// - `Ok(false)` if the vibrancy effect was not previously applied by this crate.
+pub fn clear_vibrancy(window: impl raw_window_handle::HasWindowHandle) -> Result<bool, Error> {
+    match window.window_handle()?.as_raw() {
+        #[cfg(target_os = "macos")]
+        raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
+            macos::clear_vibrancy(handle.ns_view)
+        },
+        _ => Err(Error::UnsupportedPlatform(
+            "\"clear_vibrancy()\" is only supported on macOS.",
         )),
     }
 }
