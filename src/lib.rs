@@ -26,7 +26,10 @@
 mod macos;
 mod windows;
 
-pub use macos::{NSVisualEffectMaterial, NSVisualEffectState, NSVisualEffectViewTagged};
+pub use macos::{NSVisualEffectMaterial, NSVisualEffectState};
+
+#[cfg(target_os = "macos")]
+pub use macos::NSVisualEffectViewTagged;
 
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);

@@ -1,5 +1,3 @@
-#![cfg(target_os = "macos")]
-
 use objc2_app_kit::{
     NSAppKitVersionNumber, NSAppKitVersionNumber10_10, NSAppKitVersionNumber10_11,
     NSAppKitVersionNumber10_14, NSAutoresizingMaskOptions, NSView, NSVisualEffectBlendingMode,
