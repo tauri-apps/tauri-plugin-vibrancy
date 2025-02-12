@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.5.3]
+
+- [`953f69a`](https://github.com/tauri-apps/window-vibrancy/commit/953f69a1df41a4698ba1f802c097e83b8dd3f7a4) ([#169](https://github.com/tauri-apps/window-vibrancy/pull/169) by [@petersamokhin](https://github.com/tauri-apps/window-vibrancy/../../petersamokhin)) Add `clear_vibrancy` function on macOS.
+
 ## \[0.5.2]
 
 - [`3325c24`](https://github.com/tauri-apps/window-vibrancy/commit/3325c24bccbca19f6b93b11adfa0e3b2ab595f73) ([#150](https://github.com/tauri-apps/window-vibrancy/pull/150) by [@madsmtm](https://github.com/tauri-apps/window-vibrancy/../../madsmtm)) Use `objc2` internally, leading to better memory safety.
