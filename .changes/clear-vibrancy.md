@@ -1,5 +1,5 @@
 ---
-"window-vibrancy": "patch:enhance"
+"window-vibrancy": "patch"
 ---
 
 Add `clear_vibrancy` function on macOS.
