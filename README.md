@@ -36,12 +36,12 @@ For a more complete example of usage with [tauri](https://tauri.app/), see [`exa
 
 ## Available functions
 
-| Function                          | Supported platforms               | Notes |
-| :---                              | :---:                             | :---  |
-| `apply_blur`&`clear_blur`         | Windows  7/10/11 (22H1 only)      | Bad performance when resizing/dragging the window on Windows 11 build 22621+.      |
-| `apply_acrylic`&`clear_acrylic`   | Windows 10/11                     | Bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000. |
-| `apply_mica`&`clear_mica`         | Windows 11                        |       |
-| `apply_vibrancy`                  | macOS 10.10 and newer             |       |
+| Function                          |     Supported platforms      | Notes                                                                                              |
+|:----------------------------------|:----------------------------:|:---------------------------------------------------------------------------------------------------|
+| `apply_blur`&`clear_blur`         | Windows  7/10/11 (22H1 only) | Bad performance when resizing/dragging the window on Windows 11 build 22621+.                      |
+| `apply_acrylic`&`clear_acrylic`   |        Windows 10/11         | Bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000. |
+| `apply_mica`&`clear_mica`         |          Windows 11          |                                                                                                    |
+| `apply_vibrancy`&`clear_vibrancy` |    macOS 10.10 and newer     |                                                                                                    |
 
 ## Screenshots
 
