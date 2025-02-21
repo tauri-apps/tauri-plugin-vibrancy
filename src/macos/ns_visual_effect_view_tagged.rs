@@ -1,7 +1,8 @@
-use objc2::define_class;
-use objc2::msg_send;
-use objc2::rc::{Allocated, Retained};
-use objc2::DeclaredClass;
+use objc2::{
+    define_class, msg_send,
+    rc::{Allocated, Retained},
+    DeclaredClass,
+};
 use objc2_app_kit::{
     NSAutoresizingMaskOptions, NSVisualEffectBlendingMode, NSVisualEffectMaterial,
     NSVisualEffectState, NSVisualEffectView,
