@@ -274,9 +274,9 @@ unsafe fn SetWindowCompositionAttribute(
             AccentState: accent_state as _,
             AccentFlags: if is_acrylic { 0 } else { 2 },
             GradientColor: (color.0 as u32)
-                | (color.1 as u32) << 8
-                | (color.2 as u32) << 16
-                | (color.3 as u32) << 24,
+                | ((color.1 as u32) << 8)
+                | ((color.2 as u32) << 16)
+                | ((color.3 as u32) << 24),
             AnimationId: 0,
         };
 
