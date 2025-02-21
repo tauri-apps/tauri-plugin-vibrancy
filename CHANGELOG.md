@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.6.0]
+
+- [`03fd627`](https://github.com/tauri-apps/window-vibrancy/commit/03fd627c4bbf740b4931b231095d08e27e838b91) ([#171](https://github.com/tauri-apps/window-vibrancy/pull/171) by [@FabianLars](https://github.com/tauri-apps/window-vibrancy/../../FabianLars)) Update `objc2` to 0.6.0. This raises the msrv to 1.71.
+
 ## \[0.5.3]
 
 - [`953f69a`](https://github.com/tauri-apps/window-vibrancy/commit/953f69a1df41a4698ba1f802c097e83b8dd3f7a4) ([#169](https://github.com/tauri-apps/window-vibrancy/pull/169) by [@petersamokhin](https://github.com/tauri-apps/window-vibrancy/../../petersamokhin)) Add `clear_vibrancy` function on macOS.
