@@ -52,15 +52,11 @@ pub unsafe fn apply_vibrancy(
                 .unwrap_or(NSVisualEffectState::FollowsWindowActiveState),
         );
         blurred_view.setAutoresizingMask(
-            NSAutoresizingMaskOptions::NSViewWidthSizable
-                | NSAutoresizingMaskOptions::NSViewHeightSizable,
+            NSAutoresizingMaskOptions::ViewWidthSizable
+                | NSAutoresizingMaskOptions::ViewHeightSizable,
         );
 
-        view.addSubview_positioned_relativeTo(
-            &blurred_view,
-            NSWindowOrderingMode::NSWindowBelow,
-            None,
-        );
+        view.addSubview_positioned_relativeTo(&blurred_view, NSWindowOrderingMode::Below, None);
     }
 
     Ok(())

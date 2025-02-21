@@ -1,13 +1,13 @@
-use objc2::mutability::MainThreadOnly;
+use objc2::define_class;
+use objc2::msg_send;
 use objc2::rc::{Allocated, Retained};
-use objc2::ClassType;
 use objc2::DeclaredClass;
-use objc2::{declare_class, msg_send, msg_send_id};
 use objc2_app_kit::{
     NSAutoresizingMaskOptions, NSVisualEffectBlendingMode, NSVisualEffectMaterial,
     NSVisualEffectState, NSVisualEffectView,
 };
-use objc2_foundation::{CGFloat, NSInteger, NSRect};
+use objc2_core_foundation::CGFloat;
+use objc2_foundation::{NSInteger, NSRect};
 
 /// NSVisualEffectViewTagged state.
 /// Forced to be public by declare_class! macro.
@@ -17,24 +17,16 @@ pub struct NSVisualEffectViewTaggedIvars {
     pub tag: NSInteger,
 }
 
-declare_class!(
+define_class!(
     /// A custom NSVisualEffectView subclass
     /// that overrides the tag method to provide a custom tag, to later identify the view
+    #[unsafe(super(NSVisualEffectView))]
+    #[name = "NSVisualEffectViewTagged"]
+    #[ivars = NSVisualEffectViewTaggedIvars]
     pub struct NSVisualEffectViewTagged;
 
-    unsafe impl ClassType for NSVisualEffectViewTagged {
-        type Super = NSVisualEffectView;
-        type Mutability = MainThreadOnly;
-
-        const NAME: &'static str = "NSVisualEffectViewTagged";
-    }
-
-    impl DeclaredClass for NSVisualEffectViewTagged {
-      type Ivars = NSVisualEffectViewTaggedIvars;
-    }
-
-    unsafe impl NSVisualEffectViewTagged {
-        #[method(tag)]
+    impl NSVisualEffectViewTagged {
+        #[unsafe(method(tag))]
         fn tag(&self) -> NSInteger {
             self.ivars().tag
         }
@@ -54,7 +46,7 @@ impl NSVisualEffectViewTagged {
         let state = NSVisualEffectViewTaggedIvars { tag };
         let this = this.set_ivars(state);
 
-        msg_send_id![super(this), initWithFrame: frame_rect]
+        msg_send![super(this), initWithFrame: frame_rect]
     }
 
     /// <https://developer.apple.com/documentation/appkit/nsvisualeffectview/material-swift.property>
